@@ -65,5 +65,8 @@
   "data_error": "Internal server error.",
   "delete_data": "Data is deleted.",
   "update_data": "The data successfully updated.",
-
+  "token_expired": "Token expired.",
+  "token_revoked": "Token revoked.",
+  "login_again": "Please login again.",
+  "success": "Successful"
 }
