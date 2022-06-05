@@ -4,8 +4,9 @@ from webargs import fields, validate
 from webargs.flaskparser import use_kwargs
 
 from src.errors import CustomException
-from src.repositories.auth.auth import AuthHandler
+from src.repositories.auth.auth import AuthHandler, TokenHandler
 from src.repositories.datastore.memorydb import Challenge
+from src.response import ResponseAPI
 from src.routes.pages import PAGES_BLUEPRINT
 from src.utils.strings import gettext
 
@@ -31,6 +32,30 @@ class AuthorizationResource(Resource):
             raise CustomException(gettext("server_error"), 500, 2201, e.args)
 
 
+class TokenResource(Resource):
+    @use_kwargs({"grant_type": fields.Str(missing="authorization_code"),
+                 "client_id": fields.Str(required=True,
+                                         validate=[validate.Length(min=1, max=80)]),
+                 "client_secret": fields.Str(required=True,
+                                         validate=[validate.Length(min=1, max=80)]),
+                 "redirect_uri": fields.Str(required=True,
+                                            validate=[validate.Length(min=1, max=250)]),
+                 "code": fields.Str(required=True,
+                                    validate=[validate.Length(min=1, max=250)]),
+                 "code_verifier": fields.Str(missing="")}, location="json")
+    def post(self, grant_type, client_id,client_secret,code, redirect_uri,  code_verifier):
+        try:
+            b = TokenHandler(grant_type, client_id, client_secret, code, redirect_uri, code_verifier)
+            tokens = b.generate_token()
+            if tokens is not None:
+                return ResponseAPI.send(status_code=200, message=gettext("token_success"), data=tokens)
+
+            raise CustomException(gettext("invalid_code"), 403, 10801)
+
+        except Exception as e:
+            raise CustomException(gettext("server_error"), 500, 2201, e.args)
+
+
 @PAGES_BLUEPRINT.route("/login/<challenge_id>", methods=["GET", "POST"])
 def login(challenge_id):
     if request.method == "POST":
@@ -43,7 +68,8 @@ def login(challenge_id):
             challenge = auth_handler.get_challenge_with_code()
             if challenge is not None:
                 session['username'] = username
-                redirect(challenge.redirect_uri + "?code=" + challenge.authorization_code + "&state=" + challenge.state)
+                return redirect(
+                    challenge.redirect_uri + "?code=" + challenge.authorization_code + "&state=" + challenge.state)
         return render_template(
             "login.html",
             challenge_id=challenge_id,
@@ -56,8 +82,8 @@ def login(challenge_id):
         auth_handler = AuthHandler(challenge_id, username)
         challenge = auth_handler.get_challenge_with_code()
         if challenge is not None:
-            print(challenge,"******")
-            return redirect(challenge.redirect_uri + "?code=" + challenge.authorization_code + "&state=" + challenge.state)
+            return redirect(
+                challenge.redirect_uri + "?code=" + challenge.authorization_code + "&state=" + challenge.state)
         session.pop('username', None)
 
     return render_template(

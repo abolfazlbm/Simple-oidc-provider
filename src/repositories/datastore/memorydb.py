@@ -1,4 +1,4 @@
-# This is temporary alternative for Redis
+# This is temporary alternative for Redis DB
 import uuid
 
 from src.utils.singleton import Singleton
@@ -39,4 +39,10 @@ class ChallengeList(metaclass=Singleton):
     def get_challenge(self, challenge_id):
         if challenge_id in self.challenge:
             return self.challenge[challenge_id]
+        return None
+
+    def pop_challenge_by_auth_code(self, authorization_code):
+        for challenge in self.challenge.values():
+            if challenge.authorization_code == authorization_code:
+                return self.challenge.pop(challenge.challenge_id)
         return None

@@ -67,6 +67,8 @@
   "update_data": "The data successfully updated.",
   "token_expired": "Token expired.",
   "token_revoked": "Token revoked.",
+  "token_success": "Token successfully created.",
   "login_again": "Please login again.",
-  "success": "Successful"
+  "success": "Successful",
+  "invalid_code": "Invalid code."
 }
