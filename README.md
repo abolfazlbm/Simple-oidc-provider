@@ -14,7 +14,7 @@ and rename .env.example to .env and changes settings
 (env) $ pip install -r /path/to/requirements.txt
 (env) $ flask db upgrade
 ```
-
+## OIDC Endpoint
 #### Authentication & Authorization Request Sample
 ```
 http://127.0.0.1:5000/api/v1/oidc/authorize?response_type=code
