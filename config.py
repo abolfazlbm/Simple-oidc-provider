@@ -9,6 +9,7 @@ class Config(object):
     """
     load_dotenv(".env", verbose=True)
     # MONGO_URI = os.environ.get("MONGO_URI")
+    SECRET_KEY = os.environ.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
     JWT_BLACKLIST_ENABLED = True
@@ -18,7 +19,6 @@ class Config(object):
     ]  # allow blacklisting for access and refresh tokens
 
     PROPAGATE_EXCEPTIONS = True
-
 
     # Put any configurations here that are common across all environments
 

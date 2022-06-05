@@ -82,7 +82,7 @@ class TokenRefreshResource(Resource):
     @jwt_required(refresh=True)
     def post(self):
         current_user = get_jwt_identity()
-        user_info = get_jwt().get('claims')
+        user_info = get_jwt()
         expires = datetime.timedelta(hours=1)
         new_token = create_access_token(identity=current_user, additional_claims=user_info, expires_delta=expires,
                                         fresh=False)

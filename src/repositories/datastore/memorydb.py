@@ -15,6 +15,8 @@ class Challenge:
         self.code_challenge = code_challenge
         self.code_challenge_method = code_challenge_method
         self.challenge_id = uuid.uuid4().hex
+        self.authorization_code = None
+        self.authorization_code_expires = None
 
     def save(self):
         ChallengeList().add_challenge(new_challenge=self)
