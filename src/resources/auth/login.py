@@ -28,7 +28,7 @@ class UserLoginResource(Resource):
                 if Cryptography.verify_password(user.password, password):
                     user_schema = UserSchema()
                     userdump = user_schema.dump(user)
-                    print(user.roles[0].name)
+
                     user_info = {
                         "firstname": userdump["firstname"],
                         "lastname": userdump["lastname"],
@@ -42,7 +42,7 @@ class UserLoginResource(Resource):
                                                        expires_delta=expires)
                     refresh_token = create_refresh_token(identity=user.id, additional_claims=user_info,
                                                          expires_delta=expires_refresh)
-
+                    print(access_token)
                     add_token_to_database(access_token)
                     add_token_to_database(refresh_token)
 
@@ -52,13 +52,13 @@ class UserLoginResource(Resource):
 
                 return ResponseAPI.send(status_code=403, message=gettext("user_invalid_credentials"), data={"code": 1020})
             return ResponseAPI.send(status_code=403, message=gettext("user_invalid_credentials"), data={"code": 1021})
-        except Exception:
-            raise CustomException(gettext("user_not_found"), 403, 1001)
+        except Exception as e:
+            raise CustomException(gettext("user_not_found"), 403, 1023, e.args)
 
 
 class SignoutResource(Resource):
 
-    @jwt_required
+    @jwt_required()
     def delete(self):
         jti = get_jwt()["jti"]
         user_identity = get_jwt_identity()

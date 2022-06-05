@@ -1,6 +1,6 @@
 import json
 
-default_locale = "fa-ir"
+default_locale = "en-gb"
 cached_strings = {}
 
 

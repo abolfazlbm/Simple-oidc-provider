@@ -26,12 +26,12 @@ class UserResource(Resource):
         super(UserResource, self).__init__()
 
     @classmethod
-    @jwt_required
+    @jwt_required()
     def get(cls, id):
         try:
             user_id = get_jwt_identity()
             user1 = UserModel.find_by_id(id)
-            if user_id == id or UserModel.find_by_id(_id=user_id).is_permission_by_db("read_users"):
+            if user_id == id or UserModel.find_by_id(_id=user_id).is_permission_by_db("SSOAdmin_read_users"):
                 if user1 is not None:
                     user_schema = UserSchema()
                     data = {"id": user1.id, "firstname": user1.firstname, "lastname": user1.lastname,
@@ -46,7 +46,7 @@ class UserResource(Resource):
             raise CustomException(gettext("user_error"), 500, 2202)
 
     @jwt_required(fresh=True)
-    @UserModel.is_permission("edit_users")  # ("create_role")
+    @UserModel.is_permission("SSOAdmin_edit_users")  # ("create_role")
     def put(self, id):
         try:
             args = self.reqparse.parse_args()
@@ -62,7 +62,7 @@ class UserResource(Resource):
             raise CustomException(gettext("server_error"), 500, 2101)
 
     @jwt_required(fresh=True)
-    @UserModel.is_permission("del_users")
+    @UserModel.is_permission("SSOAdmin_delete_users")
     def delete(self, id):
         try:
             user_id = get_jwt_identity()
@@ -119,11 +119,10 @@ class UserListResource(Resource):
         super(UserListResource, self).__init__()
 
     @classmethod
-    @jwt_required
-    @UserModel.is_permission("read_users")
+    @jwt_required()
+    @UserModel.is_permission("SSOAdmin_read_users")
     def get(cls):
         try:
-            print("OK")
             users_schema = UserSchema(many=True)
             users = UserModel.find_all()
             result = users_schema.dump(users)
@@ -132,7 +131,7 @@ class UserListResource(Resource):
             raise CustomException(gettext("server_error"), 500, 2101)
 
     @jwt_required(fresh=True)
-    @UserModel.is_permission("create_users")
+    @UserModel.is_permission("SSOAdmin_create_users")
     def post(self):
         try:
             user_id = get_jwt_identity()

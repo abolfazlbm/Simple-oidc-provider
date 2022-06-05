@@ -26,7 +26,9 @@ class UserModel(TimestampMixin, BaseModel):
     email = db.Column(db.String(80), nullable=True, unique=True)
     expires_at = db.Column(db.DateTime(timezone=True), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
-    roles = db.relationship(RoleModel, secondary=users_to_roles, backref='users', lazy="dynamic")
+    realm_id = db.Column(db.Integer, db.ForeignKey("realms.id"), nullable=False)
+
+    roles = db.relationship("RoleModel", secondary=users_to_roles, backref='users', lazy="dynamic")
 
     @classmethod
     def find_by_username(cls, username: str, deleteitem=False) -> "UserModel":
@@ -83,7 +85,7 @@ class UserModel(TimestampMixin, BaseModel):
         return False
 
     @staticmethod
-    @jwt_required
+    @jwt_required()
     def is_permission_by_db(permission_name) -> "boolean":
         user_id = get_jwt_identity()
         for role in UserModel.find_by_id(user_id).roles:

@@ -22,17 +22,17 @@ class Auth:
         #     return decrypted_token["jti"] in BLACKLIST
 
         @jwt.token_in_blocklist_loader
-        def check_if_token_revoked(decoded_token):
-            return is_token_revoked(decoded_token)
+        def check_if_token_revoked(jwt_header, jwt_payload: dict) -> bool:
+            return is_token_revoked(jwt_payload)
 
         @jwt.expired_token_loader
-        def custom_expired_token_loader_callback():
+        def custom_expired_token_loader_callback(jwt_header, jwt_payload):
             return ResponseAPI.send(status_code=401, message=gettext("token_expired"),data={"code": 4010})
 
         @jwt.revoked_token_loader
-        def custom_revoked_token_loader_callback():
+        def custom_revoked_token_loader_callback(jwt_header, jwt_payload):
             return ResponseAPI.send(status_code=401, message=gettext("token_revoked"), data={"code": 4011})
 
         @jwt.needs_fresh_token_loader
-        def custom_fresh_token_loader_callback():
+        def custom_fresh_token_loader_callback(jwt_header, jwt_payload):
             return ResponseAPI.send(status_code=401, message=gettext("login_again"), data={"code": 4012})

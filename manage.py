@@ -1,8 +1,10 @@
+
+# flask_script is not working with flask 2. This not working
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
-from app.app import app
-from app.db import sqlAlchemydb as db
+from src.app import app
+from src.db import sqlAlchemydb as db
 
 app = app
 migrate = Migrate(app, db)
