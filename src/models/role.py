@@ -20,7 +20,7 @@ class RoleModel(TimestampMixin, BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False, unique=True)
     description = db.Column(db.String(100), nullable=True)
-    permissions = db.relationship(PermissionModel, secondary=roles_to_permissions, lazy="dynamic")
+    permissions = db.relationship("PermissionModel", secondary=roles_to_permissions, backref='roles', lazy="dynamic")
 
     @classmethod
     def find_by_name(cls, _name: str) -> "RoleModel":

@@ -1,8 +1,8 @@
 import datetime
 
 from flask import request
-from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_refresh_token_required, get_jwt_claims,
-                                get_jwt_identity, jwt_required, get_raw_jwt)
+from flask_jwt_extended import (create_access_token, create_refresh_token,  get_jwt,
+                                get_jwt_identity, jwt_required)
 from flask_restful import Resource
 
 from src.blacklist import BLACKLIST
@@ -38,9 +38,9 @@ class UserLoginResource(Resource):
                     }
                     expires = datetime.timedelta(minutes=15)
                     expires_refresh = datetime.timedelta(days=20)
-                    access_token = create_access_token(identity=user.id, user_claims=user_info, fresh=True,
+                    access_token = create_access_token(identity=user.id, additional_claims=user_info, fresh=True,
                                                        expires_delta=expires)
-                    refresh_token = create_refresh_token(identity=user.id, user_claims=user_info,
+                    refresh_token = create_refresh_token(identity=user.id, additional_claims=user_info,
                                                          expires_delta=expires_refresh)
 
                     add_token_to_database(access_token)
@@ -60,7 +60,7 @@ class SignoutResource(Resource):
 
     @jwt_required
     def delete(self):
-        jti = get_raw_jwt()["jti"]
+        jti = get_jwt()["jti"]
         user_identity = get_jwt_identity()
         BLACKLIST.add(jti)
         revoke_token(user_identity)
@@ -69,9 +69,9 @@ class SignoutResource(Resource):
 
 class Singout2Resource(Resource):
     # Endpoint for revoking the current users refresh token
-    @jwt_refresh_token_required
+    @jwt_required(refresh=True)
     def delete(self):
-        jti = get_raw_jwt()['jti']
+        jti = get_jwt()['jti']
         user_identity = get_jwt_identity()
         BLACKLIST.add(jti)
         # revoke_token(user_identity,jti)
@@ -79,12 +79,12 @@ class Singout2Resource(Resource):
 
 
 class TokenRefreshResource(Resource):
-    @jwt_refresh_token_required
+    @jwt_required(refresh=True)
     def post(self):
         current_user = get_jwt_identity()
-        user_info = get_jwt_claims()
+        user_info = get_jwt().get('claims')
         expires = datetime.timedelta(hours=1)
-        new_token = create_access_token(identity=current_user, user_claims=user_info, expires_delta=expires,
+        new_token = create_access_token(identity=current_user, additional_claims=user_info, expires_delta=expires,
                                         fresh=False)
         data = {"access_token": new_token}
 

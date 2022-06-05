@@ -2,7 +2,7 @@ from datetime import datetime
 from functools import wraps
 from typing import Dict, Union
 
-from flask_jwt_extended import get_jwt_identity, get_jwt_claims, jwt_required
+from flask_jwt_extended import get_jwt_identity, get_jwt, jwt_required
 
 from src.db import sqlAlchemydb as db
 from src.models.base.baseModel import TimestampMixin, BaseModel
@@ -75,7 +75,7 @@ class UserModel(TimestampMixin, BaseModel):
 
     @staticmethod
     def is_permission_by_jwt(permission_name: str) -> "boolean":
-        claims = get_jwt_claims()
+        claims = get_jwt().get("claims")
         for item in claims["roles"]:
             for i in item["permissions"]:
                 if permission_name in i["name"]:

@@ -1,5 +1,5 @@
 from flask import request
-from flask_jwt_extended import jwt_required, get_jwt_identity, fresh_jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource, reqparse
 
 from src.errors import CustomException
@@ -45,7 +45,7 @@ class UserResource(Resource):
         except Exception:
             raise CustomException(gettext("user_error"), 500, 2202)
 
-    @fresh_jwt_required
+    @jwt_required(fresh=True)
     @UserModel.is_permission("edit_users")  # ("create_role")
     def put(self, id):
         try:
@@ -61,7 +61,7 @@ class UserResource(Resource):
         except Exception:
             raise CustomException(gettext("server_error"), 500, 2101)
 
-    @fresh_jwt_required
+    @jwt_required(fresh=True)
     @UserModel.is_permission("del_users")
     def delete(self, id):
         try:
@@ -85,7 +85,7 @@ class UserChangePassResource(Resource):
         self.reqparse.add_argument('newpassword', type=str, location='json', required=True)
         super(UserChangePassResource, self).__init__()
 
-    @fresh_jwt_required
+    @jwt_required(fresh=True)
     def post(self):
         try:
             user_id = get_jwt_identity()
@@ -131,7 +131,7 @@ class UserListResource(Resource):
         except Exception:
             raise CustomException(gettext("server_error"), 500, 2101)
 
-    @fresh_jwt_required
+    @jwt_required(fresh=True)
     @UserModel.is_permission("create_users")
     def post(self):
         try:
