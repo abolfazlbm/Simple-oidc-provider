@@ -4,7 +4,7 @@
 This project is simple OpenID Connect Provider application.
 This application implement simple flow of OpenID protocol from scratch.
 
-## Warnig
+## Warning
 Don't use this project in production
 
 ## Setup
